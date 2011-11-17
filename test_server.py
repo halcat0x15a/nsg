@@ -1,5 +1,4 @@
 import unittest
-import threading
 import server
 import client
 import nsg_object
@@ -16,8 +15,7 @@ class ServerTestCase(unittest.TestCase):
         self.assertEquals(self.server.mode, server.LOGIN)
         self.assertEquals(len(self.client.send((self.host, None))), 1)
         self.assertTrue(self.host in self.client.send((self.host, None)))
-        other_thread = threading.Thread(target=lambda: self.client.send((self.gest, None)))
-        other_thread.start()
+        other_thread = self.client.async_send((self.gest, None))
         while len(self.client.send((self.host, None))) == 1:
             pass
         self.assertEquals(len(self.client.send((self.host, None))), 2)
@@ -31,8 +29,7 @@ class ServerTestCase(unittest.TestCase):
         self.test_login()
         self.assertEquals(self.server.mode, server.MENU)
         self.host_player = nsg_object.Player()
-        other_thread = threading.Thread(target=lambda: self.client.send((self.host, self.host_player)))
-        other_thread.start()
+        other_thread = self.client.async_send((self.host, self.host_player))
         self.assertTrue(other_thread.is_alive())
         self.gest_player = nsg_object.Player()
         self.assertEquals(self.client.send((self.gest, self.gest_player)), server.BATTLE)
@@ -53,10 +50,5 @@ class ServerTestCase(unittest.TestCase):
     def tearDown(self):
         self.server.shutdown()
 
-def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest((unittest.makeSuite(ServerTestCase)))
-    return suite
-
 if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
+    unittest.main()

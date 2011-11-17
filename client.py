@@ -1,4 +1,5 @@
 import socket
+import threading
 import cPickle
 import server
 
@@ -14,3 +15,8 @@ class Client(object):
         response = self.socket.recv(server.RECV_BUF)
         self.socket.close()
         return cPickle.loads(response)
+
+    def async_send(self, data):
+        thread = threading.Thread(target=lambda: self.send(data))
+        thread.start()
+        return thread
