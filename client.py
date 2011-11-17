@@ -1,5 +1,6 @@
 import socket
-import pickle
+import cPickle
+import server
 
 class Client(object):
 
@@ -9,7 +10,7 @@ class Client(object):
     def send(self, data):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect(self.address)
-        sent = self.socket.send(pickle.dumps(data))
-        response = self.socket.recv(1024)
+        sent = self.socket.send(cPickle.dumps(data))
+        response = self.socket.recv(server.RECV_BUF)
         self.socket.close()
-        return pickle.loads(response)
+        return cPickle.loads(response)
