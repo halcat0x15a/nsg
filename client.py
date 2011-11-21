@@ -1,3 +1,4 @@
+import functools
 import socket
 import threading
 import cPickle
@@ -8,15 +9,10 @@ class Client(object):
     def __init__(self, address):
         self.address = address
 
-    def send(self, data):
+    def send(self, data, response=True):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect(self.address)
-        sent = self.socket.send(cPickle.dumps(data))
-        response = self.socket.recv(server.RECV_BUF)
+        self.socket.send(cPickle.dumps(data))
+        data = cPickle.loads(self.socket.recv(server.RECV_BUF)) if response else None
         self.socket.close()
-        return cPickle.loads(response)
-
-    def async_send(self, data):
-        thread = threading.Thread(target=lambda: self.send(data))
-        thread.start()
-        return thread
+        return data
