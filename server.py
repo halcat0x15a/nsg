@@ -14,6 +14,8 @@ SCORE = 'Score'
 
 EXIT = 'Exit'
 
+PAUSE = 'Pause'
+
 CV = threading.Condition()
 
 def lock():
@@ -51,6 +53,13 @@ class Handler(SocketServer.BaseRequestHandler):
 
     @lock()
     def _battle(self, client_ip, obj):
+        if obj == PAUSE:
+            self.server.pause = client_ip
+            return PAUSE
+        elif self.server.pause == client_ip:
+            self.server.pause = None
+        elif self.server.pause:
+            return PAUSE
         self.server.players[client_ip] = obj
         living = [player for player in self.server.players.values() if player.life > 0]
         if len(living) == 1:
@@ -85,6 +94,7 @@ class Server(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
         self.performance = performance
         self.mode = LOGIN
         self.players = {}
+        self.pause = None
 
 def create_server(host, port, performance=True, daemon=True):
     server = Server(host, port, performance)

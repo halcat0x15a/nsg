@@ -3,6 +3,9 @@ class Object(object):
     def draw(self):
         pass
 
+    def __eq__(self, other):
+        return hasattr(other, '__dict__') and self.__dict__ == other.__dict__
+
 class Player(Object):
     
     def __init__(self, coordinates=(0, 0, 0), eye=(0, 0, 0)):

@@ -33,14 +33,23 @@ class ServerTestCase(unittest.TestCase):
 
     def test_battle(self):
         self.test_menu()
-        host_player = self.client.send((self.host, self.host_player))[self.host]
-        self.assertEquals(host_player.coordinates, self.host_player.coordinates)
-        self.assertEquals(host_player.eye, self.host_player.eye)
+        old_player = self.host_player
+        self.host_player = self.client.send((self.host, self.host_player))[self.host]
+        self.assertEquals(self.host_player.coordinates, old_player.coordinates)
+        self.assertEquals(self.host_player.eye, old_player.eye)
         self.gest_player.eye = (1, 2, 3)
         self.gest_player.coordinates = (1, 2, 3)
-        gest_player = self.client.send((self.gest, self.gest_player))[self.gest]
-        self.assertEquals(gest_player.coordinates, self.gest_player.coordinates)
-        self.assertEquals(gest_player.eye, self.gest_player.eye)
+        old_player = self.gest_player
+        self.gest_player = self.client.send((self.gest, self.gest_player))[self.gest]
+        self.assertEquals(self.gest_player.coordinates, old_player.coordinates)
+        self.assertEquals(self.gest_player.eye, old_player.eye)
+        mode = self.client.send((self.gest, server.PAUSE))
+        self.assertEquals(mode, server.PAUSE)
+        mode = self.client.send((self.host, self.host_player))
+        self.assertEquals(mode, server.PAUSE)
+        old_player = self.gest_player
+        self.gest_player = self.client.send((self.gest, self.gest_player))[self.gest]
+        self.assertEquals(old_player, self.gest_player)
         self.gest_player.life = 0
         self.client.send((self.gest, self.gest_player), False)
         mode = self.client.send((self.host, self.host_player))
