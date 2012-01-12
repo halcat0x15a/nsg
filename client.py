@@ -6,8 +6,8 @@ import server
 
 class Client(object):
 
-    def __init__(self, address):
-        self.address = address
+    def __init__(self, address, port):
+        self.address = (address, port)
 
     def send(self, data, response=True):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
