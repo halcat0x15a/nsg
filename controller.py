@@ -12,6 +12,7 @@ class Controller(object):
         self.keymap = {BUTTON_A:False, LEFT:False, UP:False, RIGHT:False, DOWN:False}
         self._pos = None
         self.button_a = False
+        self.current_key = None
 
     def pos(self):
         x, y = self._pos if self._pos else pygame.mouse.get_pos()
@@ -42,17 +43,19 @@ class Controller(object):
             elif e.type == MOUSEBUTTONUP:
                 self.button_a = False
             elif e.type == KEYDOWN:
+                key = e.key
+                self.current_key = key
                 self._set_arrow_keymap(e, True)
             elif e.type == KEYUP:
-                self._set_arrow_keymap(e, False)
+                self._set_arrow_keymap(e.key, False)
         return True
 
     def _set_arrow_keymap(self, key, flag):
-        if e.key == K_a:
+        if key == K_a:
             self.keymap[LEFT] = flag
-        elif e.key == K_d:
+        elif key == K_d:
             self.keymap[RIGHT] = flag
-        elif e.key == K_w:
+        elif key == K_w:
             self.keymap[UP] = flag
-        elif e.key == K_s:
+        elif key == K_s:
             self.keymap[DOWN] = flag

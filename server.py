@@ -1,7 +1,10 @@
 import threading
 import cPickle
+import socket
 import SocketServer
 import player
+
+PORT = 3939
 
 RECV_BUF = 8192
 
@@ -151,7 +154,13 @@ class Server(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
                 CV.wait()
             return data
 
-def create_server(host, port, performance=True, daemon=True):
+def host():
+    return socket.gethostbyname(socket.gethostname())
+
+def address():
+    return (host(), PORT)
+
+def create_server(host=host(), port=PORT, performance=True, daemon=True):
     server = Server(host, port, performance)
     server_thread = threading.Thread(target=server.serve_forever)
     server_thread.setDaemon(daemon)

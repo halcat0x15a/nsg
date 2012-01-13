@@ -3,6 +3,7 @@ from text import *
 import scene
 
 from login import Login
+from lobby import Lobby
 
 TITLE_BOUNDS = (200,400,400,70)
 START_BOUNDS = (360,250,80,35)
@@ -41,9 +42,9 @@ class Title(object):
 
     def _player_select_action(self, controller):
         if controller.button_a and scene.contains(HOST_BOUNDS, controller):
-            return Login()
+            return Lobby()
         elif controller.button_a and scene.contains(GUEST_BOUNDS, controller):
-            return
+            return Login()
         return self
 
     def action(self, controller):
