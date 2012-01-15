@@ -1,0 +1,2 @@
+class Battle(object):
+    pass

@@ -12,11 +12,13 @@ def main():
     while True:
         glClear(GL_COLOR_BUFFER_BIT)
         if not controller.poll():
+            if hasattr(scene, 'server'):
+                print 'shutdown'
+                scene.server.shutdown()
             return
-        new_scene = scene.action(controller)
         scene.draw()
         pygame.display.flip()
-        scene = new_scene
+        scene = scene.action(controller)
 
 if __name__ == '__main__':
     main()

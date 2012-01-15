@@ -13,3 +13,17 @@ class Player(Object):
         self.eye = eye
         self.waiting = False
         self.life = 100
+
+IT = Player()
+
+EM = Player()
+
+ID = Player()
+
+DD = Player()
+
+IB = Player()
+
+FC = Player()
+
+PLAYERS = [IT, EM, ID, DD, IB, FC]

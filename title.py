@@ -36,14 +36,16 @@ class Title(object):
         {START_MENU:self._start_menu_draw, PLAYER_SELECT:self._player_select_draw}[self.mode]()
 
     def _start_menu_action(self, controller):
-        if controller.button_a and scene.contains(START_BOUNDS, controller):
+        pos = controller.pos()
+        if controller.button_a and scene.contains(START_BOUNDS, pos):
             self.mode = PLAYER_SELECT
         return self
 
     def _player_select_action(self, controller):
-        if controller.button_a and scene.contains(HOST_BOUNDS, controller):
+        pos = controller.pos()
+        if controller.button_a and scene.contains(HOST_BOUNDS, pos):
             return Lobby()
-        elif controller.button_a and scene.contains(GUEST_BOUNDS, controller):
+        elif controller.button_a and scene.contains(GUEST_BOUNDS, pos):
             return Login()
         return self
 

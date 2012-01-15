@@ -37,26 +37,26 @@ def lock():
 class Handler(SocketServer.BaseRequestHandler):
 
     @lock()
-    def _login(self, client_ip, obj):
+    def _login(self, client_id, obj):
         if self.server.waiting:
-            self.server.players[client_ip].waiting = True
+            self.server.players[client_id].waiting = True
             if player.all_waiting(self.server.players):
                 CV.notify_all()
                 self.server.mode = CHARACTER_SELECT
                 self.server.waiting = None
-                for client_ip in self.server.players:
-                    self.server.players[client_ip].waiting = False
+                for client_id in self.server.players:
+                    self.server.players[client_id].waiting = False
             else:
                 CV.wait()
             return CHARACTER_SELECT
-        self.server.players[client_ip] = player.Player()
+        self.server.players[client_id] = player.Player()
         if obj == CANCEL:
-            del self.server.players[client_ip]
+            del self.server.players[client_id]
             return CANCEL
-        elif client_ip == self.server.server_address[0]:
+        elif client_id == self.server.identity:
             if obj == CHARACTER_SELECT:
                 self.server.waiting = True
-                self.server.players[client_ip].waiting = True
+                self.server.players[client_id].waiting = True
                 CV.wait()
                 return CHARACTER_SELECT
             else:
@@ -64,33 +64,35 @@ class Handler(SocketServer.BaseRequestHandler):
         return LOGIN
 
     @lock()
-    def _character_select(self, client_ip, obj):
+    def _character_select(self, client_id, obj):
         if self.server.waiting:
-            self.server.players[client_ip].waiting = True
+            self.server.players[client_id].waiting = True
             if player.all_waiting(self.server.players):
                 CV.notify_all()
                 self.server.mode = STAGE_SELECT
                 self.server.waiting = None
-                for client_ip in self.server.players:
-                    self.server.players[client_ip].waiting = False
+                for client_id in self.server.players:
+                    self.server.players[client_id].waiting = False
             else:
                 CV.wait()
             return STAGE_SELECT
         elif obj == CANCEL:
-            self.server.players[client_ip].obj = None
+            self.server.players[client_id].obj = None
             return CANCEL
-        elif obj == STAGE_SELECT and client_ip == self.server.server_address[0] and all(player.objects(self.server.players)):
+        elif obj == STAGE_SELECT and client_id == self.server.identity and all(player.objects(self.server.players)):
             self.server.waiting = True
-            self.server.players[client_ip].waiting = True
+            self.server.players[client_id].waiting = True
             CV.wait()
             return STAGE_SELECT
+        elif obj:
+            self.server.players[client_id].obj = obj
+            return CHARACTER_SELECT
         else:
-            self.server.players[client_ip].obj = obj
             return CHARACTER_SELECT
 
     @lock()
-    def _stage_select(self, client_ip, obj):
-        if client_ip == self.server.server_address[0]:
+    def _stage_select(self, client_id, obj):
+        if client_id == self.server.identity:
             self.server.stage = obj
             self.server.mode = BATTLE
             CV.notify_all()
@@ -99,17 +101,17 @@ class Handler(SocketServer.BaseRequestHandler):
         return self.server.stage
 
     @lock()
-    def _battle(self, client_ip, obj):
+    def _battle(self, client_id, obj):
         if obj == PAUSE:
-            self.server.waiting = client_ip
+            self.server.waiting = client_id
             return PAUSE
-        elif self.server.waiting == client_ip:
+        elif self.server.waiting == client_id:
             self.server.waiting = None
         elif self.server.waiting:
             return PAUSE
-        self.server.players[client_ip].obj = obj
+        self.server.players[client_id].obj = obj
         if len(player.livings(self.server.players)) == 1:
-            self.server.players[client_ip].waiting = True
+            self.server.players[client_id].waiting = True
             if player.all_waiting(self.server.players):
                 for key in self.server.players.keys():
                     self.server.players[key].waiting = False
@@ -119,49 +121,35 @@ class Handler(SocketServer.BaseRequestHandler):
             return SCORE
         return player.object_dict(self.server.players)
 
-    def _score(self, client_ip, obj):
+    def _score(self, client_id, obj):
         pass
 
-    def _send_response(self, client_ip, obj):
+    def _send_response(self, client_id, obj):
         response_dict = {LOGIN: self._login, CHARACTER_SELECT: self._character_select, STAGE_SELECT: self._stage_select, BATTLE: self._battle}
-        response = response_dict[self.server.mode](client_ip, obj)
+        response = response_dict[self.server.mode](client_id, obj)
         self.request.send(cPickle.dumps(response))
 
     def handle(self):
         data = cPickle.loads(self.request.recv(RECV_BUF))
-        client_ip = self.client_address[0] if self.server.performance else data[0]
-        obj = data if self.server.performance else data[1]
-        self._send_response(client_ip, obj)
+        client_id = data[0]
+        obj = data[1]
+        self._send_response(client_id, obj)
 
 class Server(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 
-    def __init__(self, host, port, performance):
+    def __init__(self, identity, host, port):
         SocketServer.TCPServer.__init__(self, (host, port), Handler)
-        self.performance = performance
+        self.identity = identity
         self.mode = LOGIN
         self.players = {}
         self.stage = None
         self.waiting = None
 
-    def synchronize(self, client_ip, data):
-        if self.waiting:
-            if all(waitings(self.players)):
-                CV.notify_all()
-                for client_ip in self.server.players:
-                    self.players[client_ip].waiting = False
-            else:
-                self.players[client_ip].waiting = True
-                CV.wait()
-            return data
-
 def host():
     return socket.gethostbyname(socket.gethostname())
 
-def address():
-    return (host(), PORT)
-
-def create_server(host=host(), port=PORT, performance=True, daemon=True):
-    server = Server(host, port, performance)
+def create_server(identity, host=host(), port=PORT, daemon=True):
+    server = Server(identity, host, port)
     server_thread = threading.Thread(target=server.serve_forever)
     server_thread.setDaemon(daemon)
     server_thread.start()
