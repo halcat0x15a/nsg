@@ -11,7 +11,7 @@ from stage_select import StageSelect
 
 from objects import PLAYERS
 
-NEXT_BOUNDS = (95,50,100,50)
+NEXT_BOUNDS = (95,40,100,50)
 
 class HostCharacterSelect(object):
 
@@ -30,5 +30,5 @@ class HostCharacterSelect(object):
         pos = controller.pos()
         if controller.button_a and scene.contains(NEXT_BOUNDS, pos):
             self.client.send(STAGE_SELECT)
-            return StageSelect(self.server, self.client)
+            return StageSelect(self.server, self.client, self.scene.player_id)
         return self

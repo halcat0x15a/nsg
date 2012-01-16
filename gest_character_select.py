@@ -23,5 +23,5 @@ class GestCharacterSelect(object):
         self.scene.action(controller)
         mode = self.client.send(None)
         if STAGE_SELECT == mode:
-            return LoadingStageSelect(self.client)
+            return LoadingStageSelect(self.client, self.scene.player_id)
         return self

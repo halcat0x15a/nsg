@@ -10,7 +10,7 @@ def main():
     controller = Controller()
     scene = Title()
     while True:
-        glClear(GL_COLOR_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         if not controller.poll():
             if hasattr(scene, 'server'):
                 print 'shutdown'

@@ -11,7 +11,7 @@ from host_character_select import HostCharacterSelect
 
 IP_BOUNDS = (620,510,130,30)
 TITLE_BOUNDS = (80,500,180,53)
-NEXT_BOUNDS = (95,50,100,50)
+NEXT_BOUNDS = (95,40,100,50)
 
 class Lobby(object):
 
@@ -41,4 +41,3 @@ class Lobby(object):
             return HostCharacterSelect(self.server, self.client)
         self.ip_list = self.client.send(None) 
         return self
-

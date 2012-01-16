@@ -9,16 +9,23 @@ BUTTON_A, UP, DOWN, RIGHT, LEFT = range(5)
 class Controller(object):
 
     def __init__(self):
-        self.keymap = {BUTTON_A:False, LEFT:False, UP:False, RIGHT:False, DOWN:False}
         self._pos = None
         self.button_a = False
         self.current_key = None
+        self.left = False
+        self.right = False
+        self.up = False
+        self.down = False
 
     def pos(self):
         x, y = self._pos if self._pos else pygame.mouse.get_pos()
         return (x, display.HEIGHT - y)
 
+    def rel(self):
+        return self._rel
+
     def poll(self):
+        self._rel = (0, 0)
         for e in pygame.event.get():
             if e.type == QUIT:
                 pygame.quit()
@@ -28,10 +35,10 @@ class Controller(object):
                 return False
             if e.type == JOYAXISMOTION:
                 x , y = j.get_axis(0), j.get_axis(1)
-                self.keymap[RIGHT] = True if x > 0.7 else False
-                self.keymap[UP] = True if y < -0.7 else False
-                self.keymap[LEFT] = True if x < -0.7 else False
-                self.keymap[DOWN] = True if y > 0.7 else False
+                self.left = True if x < -0.7 else False
+                self.right = True if x > 0.7 else False
+                self.up = True if y < -0.7 else False
+                self.down = True if y > 0.7 else False
             elif e.type == JOYHATMOTION:
                 self._pos = (j.get_hat(0), j.get_hat(1))
             elif e.type == JOYBUTTONDOWN:
@@ -42,20 +49,22 @@ class Controller(object):
                 self.button_a = True
             elif e.type == MOUSEBUTTONUP:
                 self.button_a = False
+            elif e.type == MOUSEMOTION:
+                self._rel = e.rel
             elif e.type == KEYDOWN:
                 key = e.key
                 self.current_key = key
-                self._set_arrow_keymap(e, True)
+                self._set_arrow_keymap(key, True)
             elif e.type == KEYUP:
                 self._set_arrow_keymap(e.key, False)
         return True
 
     def _set_arrow_keymap(self, key, flag):
         if key == K_a:
-            self.keymap[LEFT] = flag
+            self.left = flag
         elif key == K_d:
-            self.keymap[RIGHT] = flag
+            self.right = flag
         elif key == K_w:
-            self.keymap[UP] = flag
+            self.up = flag
         elif key == K_s:
-            self.keymap[DOWN] = flag
+            self.down = flag

@@ -11,14 +11,14 @@ CHARACTERS_BOUNDS = [(120,300,150,150), \
                      (320,80,150,150), \
                      (520,300,150,150), \
                      (520,80,150,150)]
-TITLE_BOUNDS = (80,500,180,53)
+TITLE_BOUNDS = (80,500,220,53)
 
 class CharacterSelect(object):
 
     def __init__(self, client):
         self.client = client
-        self.player = None
-        self.title = Text("Character select", fontsize=160, color=BLACK)
+        self.player_id = None
+        self.title = Text("Character Select", fontsize=160, color=BLACK)
         self.characters = [Image('world1'), \
                            Image('world2'), \
                            Image('world3'), \
@@ -29,7 +29,7 @@ class CharacterSelect(object):
     def draw(self):
         self.title.draw(TITLE_BOUNDS)
         for i, image in enumerate(self.characters):
-            if i == self.player:
+            if i == self.player_id:
                 bounds = [x + 10 for x in CHARACTERS_BOUNDS[i]]
                 image.draw(bounds)
             else:
@@ -39,6 +39,5 @@ class CharacterSelect(object):
         pos = controller.pos()
         for i, bounds in enumerate(CHARACTERS_BOUNDS):
              if controller.button_a and scene.contains(bounds, pos):
-                 self.player = i
+                 self.player_id = i
                  self.client.send(PLAYERS[i])
-
