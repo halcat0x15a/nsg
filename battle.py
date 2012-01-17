@@ -55,7 +55,7 @@ class Battle(object):
         xyz = [char.x, char.y, char.z]
         for i, l in enumerate(v_list):
             l.sort()
-            v_range.append((min(l) + xyz[i], max(l) + xyz[i]))
+            v_range.append((min(l) + xyz[i] - 2, max(l) + xyz[i] + 2))
         return v_range
 
     def _contains(self, obj, s_char, t_char):
@@ -84,14 +84,14 @@ class Battle(object):
                 glTranslate(bullet.center_x(), bullet.center_y(), bullet.center_z())
                 glCallList(self.bullet_obj.gl_list)
                 glPopMatrix()
-        self._ortho()
+        '''self._ortho()
         glDisable(GL_COLOR_MATERIAL)
         glDisable(GL_LIGHTING)
         glPushMatrix()
         hp = Text(str(player.life), fontsize=80, color=BLACK)
         hp.draw(HP_BOUNDS)
         glPopMatrix()
-        del hp
+        del hp'''
 
     def action(self, controller):
         player = self.objects[self.client.identity]
