@@ -5,6 +5,10 @@ import objects
 
 from text import *
 
+import server
+
+from score import Score
+
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
