@@ -43,7 +43,7 @@ class Battle(object):
         objs = [it_obj]
         self.obj = objs[0]
         self.field = fields[0]
-        self.bullet_obj = OBJ('ITkey.obj', swapyz=True)#OBJ('rifle1.obj', swapyz=True)
+        self.bullet_obj = OBJ('rifle1.obj', swapyz=True)#OBJ('ITkey.obj', swapyz=True)
         self.objects = self.client.send(objects.PLAYERS[player_id])
 
     def _range(self, obj, char):

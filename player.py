@@ -11,7 +11,7 @@ def objects(players):
     return [player.obj for player in players.values()]
 
 def all_waiting(players):
-    return [player.waiting for player in players.values()]
+    return all([player.waiting for player in players.values()])
 
 def livings(players):
     return [player for player in players.values() if player.obj.life > 0]
