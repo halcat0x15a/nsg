@@ -45,7 +45,7 @@ class Battle(object):
         self.field = fields[0]
         self.bullet_obj = OBJ('rifle1.obj', swapyz=True)
         self.objects = self.client.send(objects.PLAYERS[player_id])
-'''
+
     def _range(self, obj, char):
         v_list = [[], [], []]
         for vertex in obj.vertices:
@@ -63,7 +63,7 @@ class Battle(object):
         def f(r, n):
             return n > r[0] and n < r[1]
         return f(xr, t_char.x) and f(yr, t_char.y) and f(zr, t_char.z)
-'''
+
     def draw(self):
         self._perspective()
         glEnable(GL_COLOR_MATERIAL)
