@@ -43,7 +43,7 @@ class Battle(object):
         objs = [it_obj]
         self.obj = objs[0]
         self.field = fields[0]
-        self.bullet_obj = OBJ('rifle1.obj', swapyz=True)
+        self.bullet_obj = OBJ('rifle1.obj', swapyz=True)#OBJ('ITkey.obj', swapyz=True)
         self.objects = self.client.send(objects.PLAYERS[player_id])
 
     def _range(self, obj, char):
@@ -113,5 +113,5 @@ class Battle(object):
         if controller.button_a and player.reaction <= 0:
             player.bullets.append(objects.Bullet(player))
             player.reset_reaction()
-        self.client.send(player)
+        self.objects = self.client.send(player)
         return self
