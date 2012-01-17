@@ -26,6 +26,7 @@ class Bullet(Object):
         self.z = player.z
         self.rx = player.rx
         self.ry = player.ry
+        self.dead = False
 
     def v(self):
         return 3

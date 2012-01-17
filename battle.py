@@ -84,14 +84,14 @@ class Battle(object):
                 glTranslate(bullet.center_x(), bullet.center_y(), bullet.center_z())
                 glCallList(self.bullet_obj.gl_list)
                 glPopMatrix()
-        '''self._ortho()
+        self._ortho()
         glDisable(GL_COLOR_MATERIAL)
         glDisable(GL_LIGHTING)
         glPushMatrix()
         hp = Text(str(player.life), fontsize=80, color=BLACK)
         hp.draw(HP_BOUNDS)
         glPopMatrix()
-        del hp'''
+        del hp
 
     def action(self, controller):
         player = self.objects[self.client.identity]
@@ -101,20 +101,17 @@ class Battle(object):
         player.reaction -= 1
         others = self.objects.copy()
         del others[self.client.identity]
-        for i, bullet in enumerate(player.bullets):
-            bullet.forward()
-            if abs(bullet.x) > 10000 or abs(bullet.y) > 10000:
-                del player.bullets[i]
-                continue
-            for other in others.values():
-                if self._contains(self.obj, other, bullet):
-                    del player.bullets[i]
-                    break
         for other in others.values():
             for i, bullet in enumerate(other.bullets):
                 if self._contains(self.bullet_obj, bullet, player):
                     player.life -= 10
+                    bullet.dead = True
                     continue
+        for i, bullet in enumerate(player.bullets):
+            bullet.forward()
+            if bullet.dead or abs(bullet.x) > 10000 or abs(bullet.y) > 10000:
+                del player.bullets[i]
+                continue
         print player.life
         if controller.up:
             player.forward()
