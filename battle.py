@@ -108,12 +108,12 @@ class Battle(object):
                     continue
         for i, bullet in enumerate(player.bullets):
             bullet.forward()
-            if abs(bullet.x) > 10000 or abs(bullet.y) > 10000:
+            if bullet.dead or abs(bullet.x) > 10000 or abs(bullet.y) > 10000:
                 del player.bullets[i]
                 continue
             for other in others.values():
                 if self._contains(self.obj, other, bullet):
-                    del player.bullets[i]
+                    bullet.dead = True
                     break
         print player.life
         if controller.up:
@@ -122,4 +122,6 @@ class Battle(object):
             player.bullets.append(objects.Bullet(player))
             player.reset_reaction()
         self.objects = self.client.send(player)
+        if self.objects == server.SOCRE:
+            return Score(player.life > 0)
         return self
