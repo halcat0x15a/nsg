@@ -43,7 +43,7 @@ class Battle(object):
         objs = [it_obj]
         self.obj = objs[0]
         self.field = fields[0]
-        self.bullet_obj = OBJ('rifle1.obj', swapyz=True)#OBJ('ITkey.obj', swapyz=True)
+        self.bullet_obj = OBJ('ITkey.obj', swapyz=True)#OBJ('rifle1.obj', swapyz=True)
         self.objects = self.client.send(objects.PLAYERS[player_id])
 
     def _range(self, obj, char):
@@ -88,10 +88,10 @@ class Battle(object):
         glDisable(GL_COLOR_MATERIAL)
         glDisable(GL_LIGHTING)
         glPushMatrix()
-        hp = Text(str(player.life), fontsize=80, color=BLACK)
+        '''hp = Text(str(player.life), fontsize=80, color=BLACK)
         hp.draw(HP_BOUNDS)
         glPopMatrix()
-        del hp
+        del hp'''
 
     def action(self, controller):
         player = self.objects[self.client.identity]
