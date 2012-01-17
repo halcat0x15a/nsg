@@ -105,13 +105,16 @@ class Battle(object):
             for i, bullet in enumerate(other.bullets):
                 if self._contains(self.bullet_obj, bullet, player):
                     player.life -= 10
-                    bullet.dead = True
                     continue
         for i, bullet in enumerate(player.bullets):
             bullet.forward()
-            if bullet.dead or abs(bullet.x) > 10000 or abs(bullet.y) > 10000:
+            if abs(bullet.x) > 10000 or abs(bullet.y) > 10000:
                 del player.bullets[i]
                 continue
+            for other in others.values():
+                if self._contains(self.obj, other, bullet):
+                    del player.bullets[i]
+                    break
         print player.life
         if controller.up:
             player.forward()
