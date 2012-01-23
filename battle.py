@@ -48,25 +48,7 @@ class Battle(object):
         self.obj = objs[0]
         self.field = fields[0]
         self.bullet_obj = OBJ('ITkey.obj', swapyz=True)#OBJ('rifle1.obj', swapyz=True)
-        self.objects = self.client.send(objects.PLAYERS[player_id])
-
-    def _range(self, obj, char):
-        v_list = [[], [], []]
-        for vertex in obj.vertices:
-            for i, v in enumerate(vertex):
-                v_list[i].append(v)
-        v_range = []
-        xyz = [char.x, char.y, char.z]
-        for i, l in enumerate(v_list):
-            l.sort()
-            v_range.append((min(l) + xyz[i] - 2, max(l) + xyz[i] + 2))
-        return v_range
-
-    def _contains(self, obj, s_char, t_char):
-        xr, yr, zr = self._range(obj, s_char)
-        def f(r, n):
-            return n > r[0] and n < r[1]
-        return f(xr, t_char.x) and f(yr, t_char.y) and f(zr, t_char.z)
+        self.objects = self.client.send({client.identity: objects.PLAYERS[player_id]})
 
     def draw(self):
         self._perspective()
@@ -85,12 +67,10 @@ class Battle(object):
             glPopMatrix()
             for bullet in player.bullets:
                 glPushMatrix()
-                glTranslate(bullet.center_x(), bullet.center_y(), bullet.center_z())
+                glTranslate(bullet.x, bullet.y, bullet.z)
                 glCallList(self.bullet_obj.gl_list)
                 glPopMatrix()
         '''self._ortho()
-        glDisable(GL_COLOR_MATERIAL)
-        glDisable(GL_LIGHTING)
         glPushMatrix()
         hp = Text(str(player.life), fontsize=80, color=BLACK)
         hp.draw(HP_BOUNDS)
@@ -105,27 +85,24 @@ class Battle(object):
         player.reaction -= 1
         others = self.objects.copy()
         del others[self.client.identity]
-        for other in others.values():
-            for i, bullet in enumerate(other.bullets):
-                if self._contains(self.bullet_obj, bullet, player):
-                    player.life -= 10
-                    continue
         for i, bullet in enumerate(player.bullets):
+            for key, other in others.items():
+                if self.bullet_obj.cube.intersects(bullet, self.obj.cube, other):
+                    other.life -= 10
+                    self.objects[key] = other
+                    del player.bullets[i]
+                    break
             bullet.forward()
-            if bullet.dead or abs(bullet.x) > 10000 or abs(bullet.y) > 10000:
+            if abs(bullet.x) > 10000 or abs(bullet.y) > 10000:
                 del player.bullets[i]
                 continue
-            for other in others.values():
-                if self._contains(self.obj, other, bullet):
-                    bullet.dead = True
-                    break
-        print player.life
+        print map(lambda x: x.life, self.objects.values())
         if controller.up:
             player.forward()
         if controller.button_a and player.reaction <= 0:
             player.bullets.append(objects.Bullet(player))
             player.reset_reaction()
-        self.objects = self.client.send(player)
-        if self.objects == server.SOCRE:
+        self.objects = self.client.send(self.objects)
+        if self.objects == server.SCORE:
             return Score(player.life > 0)
         return self

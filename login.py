@@ -14,7 +14,7 @@ IP_BOUNDS = (380,280,30,30)
 class Login(object):
 
     def __init__(self):
-        self.ip = '127.0.1.1'
+        self.ip = '127.0.0.1'
 
     def _length_bounds(self, i):
         x, y, width, height = IP_BOUNDS

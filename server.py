@@ -109,7 +109,8 @@ class Handler(SocketServer.BaseRequestHandler):
             self.server.waiting = None
         elif self.server.waiting:
             return PAUSE
-        self.server.players[client_id].obj = obj
+        for k, v in obj.items():
+            self.server.players[k].obj = v
         if len(player.livings(self.server.players)) == 1:
             self.server.players[client_id].waiting = True
             if player.all_waiting(self.server.players):

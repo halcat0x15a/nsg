@@ -44,7 +44,7 @@ class Character(Object):
     
     def __init__(self, obj_id):
         self.waiting = False
-        self.life = 100
+        self.life = 10
         self.obj_id = obj_id
         self.rx = 0.
         self.ry = 0.

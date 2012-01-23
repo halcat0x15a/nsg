@@ -1,6 +1,6 @@
 from text import *
 
-from title import Title
+import title
 
 RESULT_BOUNDS = (300, 200, 200, 50)
 
@@ -14,5 +14,5 @@ class Score(object):
 
     def action(self, controller):
         if controller.button_a:
-            return Title()
+            return title.Title()
         return self

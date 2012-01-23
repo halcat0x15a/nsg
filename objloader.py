@@ -1,6 +1,41 @@
 import pygame
 from OpenGL.GL import *
 
+class Line(object):
+
+    def __init__(self, _min, _max):
+        self.min = _min
+        self.max = _max
+
+    def __add__(self, n):
+        return Line(self.min + n, self.max + n)
+
+    def intersects(self, line):
+        return (self.min < line.max and self.min > line.min) or (self.max < line.max and self.max > line.min)
+
+class Cube(object):
+
+    def __init__(self, vertices):
+        point_lists = [[], [], []]
+        for vertex in vertices:
+            for i, n in enumerate(vertex):
+                point_lists[i].append(n)
+        self.x_line = self._line(point_lists[0])
+        self.y_line = self._line(point_lists[1])
+        self.z_line = self._line(point_lists[2])
+
+    def _line(self, point_list):
+        return Line(min(point_list), max(point_list))
+
+    def _vec(self, obj):
+        return [self.x_line + obj.x, self.y_line + obj.y, self.z_line + obj.z]
+
+    def intersects(self, obj, target_cube, target_obj):
+        lines = self._vec(obj)
+        target_lines = target_cube._vec(target_obj)
+        print [s.intersects(t) for s, t in zip(lines, target_lines)]
+        return all([s.intersects(t) for s, t in zip(lines, target_lines)])
+
 def MTL(filename):
     contents = {}
     mtl = None
@@ -75,6 +110,8 @@ class OBJ:
                     else:
                         norms.append(0)
                 self.faces.append((face, norms, texcoords, material))
+
+        self.cube = Cube(self.vertices)
  
         self.gl_list = glGenLists(1)
         glNewList(self.gl_list, GL_COMPILE)
